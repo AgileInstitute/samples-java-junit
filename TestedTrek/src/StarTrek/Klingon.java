@@ -24,11 +24,25 @@ public class Klingon {
 		energy = e;
 	}
 
-	public void delete() {
+	public void beDestroyed() {
 	}
 
-	boolean isDestroyed(int damage) {
+	public boolean wouldBeDestroyedBy(int damage) {
 		return damage >= getEnergy();
 	}
+
+	public void receiveDamage(int damage) {
+		setEnergy(getEnergy() - damage);
+	}
+
+	String damagedMessage() {
+		return "Klingon has " + getEnergy() + " remaining";
+	}
+	
+	public String destroyedMessage() {
+		return "Klingon destroyed!";
+	}
+
+
 
 }

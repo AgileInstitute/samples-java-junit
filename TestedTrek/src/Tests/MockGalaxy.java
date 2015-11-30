@@ -2,9 +2,9 @@ package Tests;
 
 import java.util.HashMap;
 
-import StarTrek.Galaxy;
+import StarTrek.ProxyWebGadget;
 
-public class MockGalaxy extends Galaxy {
+public class MockGalaxy extends ProxyWebGadget {
     private HashMap<String, Object> stuff = new HashMap<String, Object>();
     private StringBuffer buffer = new StringBuffer();
     public MockGalaxy() {

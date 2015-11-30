@@ -5,7 +5,7 @@ import StarTrek.Klingon;
 
 public class MockKlingon extends Klingon {
     private int overrideDistance;
-    private boolean deleteCalled = false;
+    private boolean beDestroyedCalled = false;
 
     public MockKlingon(int distance) {
         overrideDistance = distance;
@@ -20,11 +20,11 @@ public class MockKlingon extends Klingon {
         return overrideDistance;
     }
 
-    public void delete() {
-        deleteCalled = true;
+    public void beDestroyed() {
+        beDestroyedCalled = true;
     }
 
-    boolean deleteWasCalled() {
-        return deleteCalled;
+    boolean BeDestroyedWasCalled() {
+        return beDestroyedCalled;
     }
 }

@@ -64,7 +64,7 @@ public class PhotonCharacterizationTests {
         Assert.assertEquals("Photons hit Klingon at 500 sectors with 825 units || Klingon destroyed! || ",
             context.getAllOutput());
         Assert.assertEquals(7, game.getTorpedoes());
-        Assert.assertTrue(klingon.deleteWasCalled());
+        Assert.assertTrue(klingon.BeDestroyedWasCalled());
 
     }
 

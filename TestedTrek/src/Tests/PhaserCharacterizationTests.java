@@ -56,7 +56,7 @@ public class PhaserCharacterizationTests {
         game.fireWeapon(context);
         Assert.assertEquals("Klingon out of range of phasers at " + outOfRange + " sectors... || ",
             context.getAllOutput());
-        Assert.assertEquals(EnergyInNewGame - 1000, game.EnergyRemaining());
+        Assert.assertEquals(EnergyInNewGame - 1000, game.energyRemaining());
     }
 
     @Test
@@ -68,8 +68,8 @@ public class PhaserCharacterizationTests {
         game.fireWeapon(context);
         Assert.assertEquals("Phasers hit Klingon at 2000 sectors with 400 units || Klingon destroyed! || ",
             context.getAllOutput());
-        Assert.assertEquals(EnergyInNewGame - 1000, game.EnergyRemaining());
-        Assert.assertTrue(klingon.deleteWasCalled());
+        Assert.assertEquals(EnergyInNewGame - 1000, game.energyRemaining());
+        Assert.assertTrue(klingon.BeDestroyedWasCalled());
     }
 
     @Test

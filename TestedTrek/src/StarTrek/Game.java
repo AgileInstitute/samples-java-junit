@@ -9,9 +9,13 @@ public class Game {
 	private int energy = 10000;
 	private int torpedoes = 8;
 
-    public int EnergyRemaining() {
+    public int energyRemaining() {
         return energy;
     }
+    
+	public void subtractExpendedEnergy(int amount) {
+		energy -= amount;
+	}
 
     public void setTorpedoes(int value) {
             torpedoes = value;
@@ -22,58 +26,22 @@ public class Game {
     }
 
     public void fireWeapon(WebGadget wg) {
-        fireWeapon(new Galaxy(wg));
+        fireWeapon(new ProxyWebGadget(wg));
     }
 
-    public void fireWeapon(Galaxy wg) {
+    public void fireWeapon(ProxyWebGadget wg) {
 		Klingon enemy = (Klingon) wg.variable("target");
         if (wg.parameter("command").equals("phaser")) {
-        	Phaser phaser = new Phaser();
-			firePhaser(wg, enemy);
+        	Phaser phaser = new Phaser(this);
+			phaser.firePhaser(wg, enemy);
 
 		} else if (wg.parameter("command").equals("photon")) {
+			Photon photon = new Photon(this);
 			firePhoton(wg, enemy);
 		}
 	}
 
-	private String enemyDamagedMessage(Klingon enemy) {
-		return "Klingon has " + enemy.getEnergy() + " remaining";
-	}
-
-	private String enemyDestroyedMessage() {
-		return "Klingon destroyed!";
-	}
-
-	private void damageEnemy(Klingon enemy, int damage) {
-		enemy.setEnergy(enemy.getEnergy() - damage);
-	}
-
-	private void firePhaser(Galaxy wg, Klingon enemy)
-			throws NumberFormatException {
-		int amount = Integer.parseInt(wg.parameter("amount"));
-		if (hasEnoughEnergy(amount)) {
-			int distance = enemy.distance();
-			if (phasersMissed(distance)) {
-				wg.writeLine("Klingon out of range of phasers at " + distance + " sectors...");
-			} else {
-				int damage = calculatePhaserDamage(amount, distance);
-				wg.writeLine("Phasers hit Klingon at " + distance + " sectors with " + damage + " units");
-				if (enemy.isDestroyed(damage)) {
-					wg.writeLine(enemyDestroyedMessage());
-					enemy.delete();
-				} else {
-					damageEnemy(enemy, damage);
-					wg.writeLine(enemyDamagedMessage(enemy));
-				}
-			}
-			subtractExpendedEnergy(amount);
-
-		} else {
-			wg.writeLine(insufficientEnergyMessage());
-		}
-	}
-
-	private void firePhoton(Galaxy wg, Klingon enemy) {
+	public void firePhoton(ProxyWebGadget wg, Klingon enemy) {
 		if (hasATorpedo()) {
 			int distance = enemy.distance();
 			if (torpedoMissed(distance)) {
@@ -81,12 +49,12 @@ public class Game {
 			} else {
 				int damage = calculatePhotonDamage();
 				wg.writeLine("Photons hit Klingon at " + distance + " sectors with " + damage + " units");
-				if (enemy.isDestroyed(damage)) {
-					wg.writeLine(enemyDestroyedMessage());
-					enemy.delete();
+				if (enemy.wouldBeDestroyedBy(damage)) {
+					wg.writeLine(enemy.destroyedMessage());
+					enemy.beDestroyed();
 				} else {
-					damageEnemy(enemy, damage);
-					wg.writeLine(enemyDamagedMessage(enemy));
+					enemy.receiveDamage(damage);
+					wg.writeLine(enemy.damagedMessage());
 				}
 			}
 			subtractExpendedTorpedo();
@@ -101,7 +69,7 @@ public class Game {
 	}
 
 	private boolean torpedoMissed(int distance) {
-		return rnd(4) + ((distance / 500) + 1) > 7;
+		return nextRandom(4) + ((distance / 500) + 1) > 7;
 	}
 
 	private boolean hasATorpedo() {
@@ -113,37 +81,14 @@ public class Game {
 	}
 
 	private int calculatePhotonDamage() {
-		return 800 + rnd(50);
+		return 800 + nextRandom(50);
 	}
 
-	private String insufficientEnergyMessage() {
-		return "Insufficient energy to fire phasers!";
-	}
-
-	private int calculatePhaserDamage(int amount, int distance) {
-		int damage;
-		damage = amount - (((amount /20)* distance /200) + rnd(200));
-		if (damage < 1)
-			damage = 1;
-		return damage;
-	}
-
-	private int subtractExpendedEnergy(int amount) {
-		return energy -= amount;
-	}
-
-	private boolean phasersMissed(int distance) {
-		return distance > 4000;
-	}
-
-	private boolean hasEnoughEnergy(int amount) {
-		return energy >= amount;
-	}
 
     // note we made generator public in order to mock it
     // it's ugly, but it's telling us something about our *design!* ;-)
 	public static Random generator = new Random();
-	private static int rnd(int maximum) {
+	public static int nextRandom(int maximum) {
 		return generator.nextInt(maximum);
 	}
 
