@@ -27,4 +27,8 @@ public class Klingon {
 	public void delete() {
 	}
 
+	boolean isDestroyed(int damage) {
+		return damage >= getEnergy();
+	}
+
 }

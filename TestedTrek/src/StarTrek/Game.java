@@ -36,27 +36,16 @@ public class Game {
 		}
 	}
 
-	private void firePhoton(Galaxy wg, Klingon enemy) {
-		if (hasATorpedo()) {
-			int distance = enemy.distance();
-			if (torpedoMissed(distance)) {
-				wg.writeLine("Torpedo missed Klingon at " + distance + " sectors...");
-			} else {
-				int damage = calculatePhotonDamage();
-				wg.writeLine("Photons hit Klingon at " + distance + " sectors with " + damage + " units");
-				if (enemyDestroyed(enemy, damage)) {
-					wg.writeLine(enemyDestroyedMessage());
-					enemy.delete();
-				} else {
-					damageEnemy(enemy, damage);
-					wg.writeLine(enemyDamagedMessage(enemy));
-				}
-			}
-			subtractExpendedTorpedo();
+	private String enemyDamagedMessage(Klingon enemy) {
+		return "Klingon has " + enemy.getEnergy() + " remaining";
+	}
 
-		} else {
-			wg.writeLine(insufficientResourceMessage());
-		}
+	private String enemyDestroyedMessage() {
+		return "Klingon destroyed!";
+	}
+
+	private void damageEnemy(Klingon enemy, int damage) {
+		enemy.setEnergy(enemy.getEnergy() - damage);
 	}
 
 	private void firePhaser(Galaxy wg, Klingon enemy)
@@ -69,7 +58,7 @@ public class Game {
 			} else {
 				int damage = calculatePhaserDamage(amount, distance);
 				wg.writeLine("Phasers hit Klingon at " + distance + " sectors with " + damage + " units");
-				if (enemyDestroyed(enemy, damage)) {
+				if (enemy.isDestroyed(damage)) {
 					wg.writeLine(enemyDestroyedMessage());
 					enemy.delete();
 				} else {
@@ -84,32 +73,31 @@ public class Game {
 		}
 	}
 
+	private void firePhoton(Galaxy wg, Klingon enemy) {
+		if (hasATorpedo()) {
+			int distance = enemy.distance();
+			if (torpedoMissed(distance)) {
+				wg.writeLine("Torpedo missed Klingon at " + distance + " sectors...");
+			} else {
+				int damage = calculatePhotonDamage();
+				wg.writeLine("Photons hit Klingon at " + distance + " sectors with " + damage + " units");
+				if (enemy.isDestroyed(damage)) {
+					wg.writeLine(enemyDestroyedMessage());
+					enemy.delete();
+				} else {
+					damageEnemy(enemy, damage);
+					wg.writeLine(enemyDamagedMessage(enemy));
+				}
+			}
+			subtractExpendedTorpedo();
+
+		} else {
+			wg.writeLine(insufficientResourceMessage());
+		}
+	}
+
 	private String insufficientResourceMessage() {
 		return "No more photon torpedoes!";
-	}
-
-	private int subtractExpendedTorpedo() {
-		return torpedoes -= 1;
-	}
-
-	private String enemyDamagedMessage(Klingon enemy) {
-		return "Klingon has " + enemy.getEnergy() + " remaining";
-	}
-
-	private String enemyDestroyedMessage() {
-		return "Klingon destroyed!";
-	}
-
-	private void damageEnemy(Klingon enemy, int damage) {
-		enemy.setEnergy(enemy.getEnergy() - damage);
-	}
-
-	private int calculatePhotonDamage() {
-		return 800 + rnd(50);
-	}
-
-	private String insufficientEnergyMessage() {
-		return "Insufficient energy to fire phasers!";
 	}
 
 	private boolean torpedoMissed(int distance) {
@@ -120,12 +108,16 @@ public class Game {
 		return torpedoes  > 0;
 	}
 
-	private int subtractExpendedEnergy(int amount) {
-		return energy -= amount;
+	private void subtractExpendedTorpedo() {
+		setTorpedoes(getTorpedoes() - 1);
 	}
 
-	private boolean enemyDestroyed(Klingon enemy, int damage) {
-		return damage >= enemy.getEnergy();
+	private int calculatePhotonDamage() {
+		return 800 + rnd(50);
+	}
+
+	private String insufficientEnergyMessage() {
+		return "Insufficient energy to fire phasers!";
 	}
 
 	private int calculatePhaserDamage(int amount, int distance) {
@@ -134,6 +126,10 @@ public class Game {
 		if (damage < 1)
 			damage = 1;
 		return damage;
+	}
+
+	private int subtractExpendedEnergy(int amount) {
+		return energy -= amount;
 	}
 
 	private boolean phasersMissed(int distance) {
@@ -150,6 +146,5 @@ public class Game {
 	private static int rnd(int maximum) {
 		return generator.nextInt(maximum);
 	}
-
 
 }
