@@ -16,14 +16,9 @@ public class PhaserCharacterizationTests {
 
     private static final int EnergyInNewGame = 10000;
 
-    @After
-    public void removeTheMockRandomGeneratorForOtherTests_IReallyWantToRefactorThatStaticVariableSoon() {
-        Game.generator = new Random();
-    }
-
     @Before
     public void setUp() {
-        game = new Game();
+        game = new Game(new MockRandom());
         context = new MockGalaxy();
         context.setValueForTesting("command", "phaser");
     }
@@ -64,7 +59,6 @@ public class PhaserCharacterizationTests {
         MockKlingon klingon = new MockKlingon(2000, 200);
         context.setValueForTesting("amount", "1000");
         context.setValueForTesting("target", klingon);
-        Game.generator = new MockRandom();
         game.fireWeapon(context);
         Assert.assertEquals("Phasers hit Klingon at 2000 sectors with 400 units || Klingon destroyed! || ",
             context.getAllOutput());
@@ -78,7 +72,6 @@ public class PhaserCharacterizationTests {
         String minimalHit = "1";
         context.setValueForTesting("amount", minimalFired);
         context.setValueForTesting("target", new MockKlingon(2000, 200));
-        Game.generator = new MockRandom();
         game.fireWeapon(context);
         Assert.assertEquals("Phasers hit Klingon at 2000 sectors with " +
             minimalHit + " units || Klingon has 199 remaining || ",

@@ -43,6 +43,16 @@ public class Klingon {
 		return "Klingon destroyed!";
 	}
 
+	void takeHit(ProxyWebGadget wg, int damage) {
+		if (wouldBeDestroyedBy(damage)) {
+			beDestroyed();
+			wg.writeLine(destroyedMessage());
+		} else {
+			receiveDamage(damage);
+			wg.writeLine(damagedMessage());
+		}
+	}
+
 
 
 }
