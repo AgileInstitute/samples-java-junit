@@ -31,57 +31,14 @@ public class Game {
 
     public void fireWeapon(ProxyWebGadget wg) {
 		Klingon enemy = (Klingon) wg.variable("target");
+		Weapon weapon = null;
         if (wg.parameter("command").equals("phaser")) {
-        	Phaser phaser = new Phaser(this);
-			phaser.firePhaser(wg, enemy);
+        	weapon = new Phaser(this);
 
 		} else if (wg.parameter("command").equals("photon")) {
-			Photon photon = new Photon(this);
-			firePhoton(wg, enemy);
+			weapon = new Photon(this);
 		}
-	}
-
-	public void firePhoton(ProxyWebGadget wg, Klingon enemy) {
-		if (hasATorpedo()) {
-			int distance = enemy.distance();
-			if (torpedoMissed(distance)) {
-				wg.writeLine("Torpedo missed Klingon at " + distance + " sectors...");
-			} else {
-				int damage = calculatePhotonDamage();
-				wg.writeLine("Photons hit Klingon at " + distance + " sectors with " + damage + " units");
-				if (enemy.wouldBeDestroyedBy(damage)) {
-					wg.writeLine(enemy.destroyedMessage());
-					enemy.beDestroyed();
-				} else {
-					enemy.receiveDamage(damage);
-					wg.writeLine(enemy.damagedMessage());
-				}
-			}
-			subtractExpendedTorpedo();
-
-		} else {
-			wg.writeLine(insufficientResourceMessage());
-		}
-	}
-
-	private String insufficientResourceMessage() {
-		return "No more photon torpedoes!";
-	}
-
-	private boolean torpedoMissed(int distance) {
-		return nextRandom(4) + ((distance / 500) + 1) > 7;
-	}
-
-	private boolean hasATorpedo() {
-		return torpedoes  > 0;
-	}
-
-	private void subtractExpendedTorpedo() {
-		setTorpedoes(getTorpedoes() - 1);
-	}
-
-	private int calculatePhotonDamage() {
-		return 800 + nextRandom(50);
+		weapon.fire(wg, enemy);
 	}
 
 

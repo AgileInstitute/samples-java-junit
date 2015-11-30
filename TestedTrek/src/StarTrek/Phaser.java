@@ -5,16 +5,15 @@ public class Phaser extends Weapon {
 		super(game);
 	}
 	
-	public void firePhaser(ProxyWebGadget wg, Klingon enemy)
-			throws NumberFormatException {
-		int amount = Integer.parseInt(wg.parameter("amount"));
-		if (hasEnoughEnergy(amount)) {
+	public void fire(ProxyWebGadget wg, Klingon enemy) {
+		int amount = extractAmountToFire(wg);
+		if (hasSufficientResourceToFire(amount)) {
 			int distance = enemy.distance();
-			if (phasersMissed(distance)) {
-				wg.writeLine("Klingon out of range of phasers at " + distance + " sectors...");
+			if (missed(distance)) {
+				wg.writeLine(missedMessage(distance));
 			} else {
-				int damage = calculatePhaserDamage(amount, distance);
-				wg.writeLine("Phasers hit Klingon at " + distance + " sectors with " + damage + " units");
+				int damage = calculateDamage(amount, distance);
+				wg.writeLine(hitMessage(distance, damage));
 				if (enemy.wouldBeDestroyedBy(damage)) {
 					wg.writeLine(enemy.destroyedMessage());
 					enemy.beDestroyed();
@@ -23,18 +22,35 @@ public class Phaser extends Weapon {
 					wg.writeLine(enemy.damagedMessage());
 				}
 			}
-			game.subtractExpendedEnergy(amount);
+			subtractExpendedResource(amount);
 
 		} else {
-			wg.writeLine(insufficientEnergyMessage());
+			wg.writeLine(insufficientResoureMessage());
 		}
 	}
 
-	private String insufficientEnergyMessage() {
+	private int extractAmountToFire(ProxyWebGadget wg) 
+			throws NumberFormatException {
+		return Integer.parseInt(wg.parameter("amount"));
+	}
+
+	private String hitMessage(int distance, int damage) {
+		return "Phasers hit Klingon at " + distance + " sectors with " + damage + " units";
+	}
+
+	private String missedMessage(int distance) {
+		return "Klingon out of range of phasers at " + distance + " sectors...";
+	}
+
+	private void subtractExpendedResource(int amount) {
+		game.subtractExpendedEnergy(amount);
+	}
+
+	private String insufficientResoureMessage() {
 		return "Insufficient energy to fire phasers!";
 	}
 
-	private int calculatePhaserDamage(int amount, int distance) {
+	private int calculateDamage(int amount, int distance) {
 		int damage;
 		damage = amount - (((amount /20)* distance /200) + game.nextRandom(200));
 		if (damage < 1)
@@ -42,11 +58,11 @@ public class Phaser extends Weapon {
 		return damage;
 	}
 
-	private boolean phasersMissed(int distance) {
+	private boolean missed(int distance) {
 		return distance > 4000;
 	}
 
-	private boolean hasEnoughEnergy(int amount) {
+	private boolean hasSufficientResourceToFire(int amount) {
 		return game.energyRemaining() >= amount;
 	}
 
