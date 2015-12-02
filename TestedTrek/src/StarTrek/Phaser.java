@@ -32,10 +32,14 @@ public class Phaser extends Weapon {
 
 	protected int calculateDamage(int amount, int distance) {
 		int damage;
-		damage = amount - (((amount /20)* distance /200) + game.nextRandom(200));
+		damage = amount - impactOfDistanceOnPhaserPower(amount, distance);
 		if (damage < 1)
 			damage = 1;
 		return damage;
+	}
+
+	private int impactOfDistanceOnPhaserPower(int amount, int distance) {
+		return ((amount / 20) * distance / 200) + game.nextRandom(200);
 	}
 
 	protected boolean missed(int distance) {

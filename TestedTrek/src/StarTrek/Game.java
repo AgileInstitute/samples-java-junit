@@ -55,7 +55,7 @@ public class Game {
 		} else if (weaponType.equals("photon")) {
 			return new Photon(this);
 		}
-		// behavior was no-op, but untested; now it throws, but untested. Which is worse?
+		// TODO: behavior was no-op, but untested; now it throws, but untested. Which is worse?
 		throw new InvalidParameterException("No such weapon " + weaponType);
 	}
 
