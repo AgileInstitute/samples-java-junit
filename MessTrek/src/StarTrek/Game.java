@@ -1,14 +1,28 @@
 ﻿package StarTrek;
 
 import java.util.Random;
+
+import tests.ProxyWebGadget;
 import Untouchables.WebGadget;
 
 public class Game {
 
 	private int e = 10000;
 	private int t = 8;
-
+	
+	/**
+	 * This is the public-facing method signature that existed in the original.
+	 * @param wg
+	 */
 	public void fireWeapon(WebGadget wg) {
+		fireWeapon(new ProxyWebGadget(wg));
+	}
+	
+	/**
+	 * This is the new, testable method that contains all the *unchanged* code.
+	 * @param wg
+	 */
+	public void fireWeapon(ProxyWebGadget wg) {
 		if (wg.parameter("command").equals("phaser")) {
 			int amount = Integer.parseInt(wg.parameter("amount"));
 			Klingon enemy = (Klingon) wg.variable("target");
@@ -60,9 +74,13 @@ public class Game {
 		}
 	}
 
-	private static Random generator = new Random();
+	public static Random generator = new Random();
 	private static int rnd(int maximum) {
 		return generator.nextInt(maximum);
+	}
+
+	public int torpedoesRemaining() {
+		return t;
 	}
 
 }
