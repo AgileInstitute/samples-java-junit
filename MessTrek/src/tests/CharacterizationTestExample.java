@@ -38,10 +38,12 @@ public class CharacterizationTestExample {
 		Klingon target = Mockito.mock(Klingon.class);
 		Mockito.when(target.distance())
 			.thenReturn(365);
-		// let's make the mock Klingon ignore setEnergy(). Just for fun.
+		int klingonInitialEnergy = 2000;
+		int klingonEnergyRemainingAfterDamage = klingonInitialEnergy-802;
 		Mockito.when(target.getEnergy())
-			.thenReturn(2000)
-			.thenReturn(42);
+			.thenReturn(klingonInitialEnergy)
+			.thenReturn(klingonInitialEnergy)
+			.thenReturn(klingonEnergyRemainingAfterDamage);
 
 		ProxyWebGadget mockProxyWebGadget = Mockito.mock(ProxyWebGadget.class);
 		Mockito.when(mockProxyWebGadget.parameter("command"))
@@ -55,12 +57,13 @@ public class CharacterizationTestExample {
 		// then
 		assertEquals(7, game.torpedoesRemaining());
 		Mockito.verify(target, Mockito.never()).delete();
+		Mockito.verify(target, Mockito.times(1)).setEnergy(klingonEnergyRemainingAfterDamage);
 		Mockito.verify(mockProxyWebGadget,
 				Mockito.times(1)).writeLine(
 						"Photons hit Klingon at 365 sectors with 802 units");
 		Mockito.verify(mockProxyWebGadget,
 				Mockito.times(1)).writeLine(
-						"Klingon has 42 remaining");
+						"Klingon has 1198 remaining");
 	}
 
 }
